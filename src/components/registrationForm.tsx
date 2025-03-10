@@ -1,17 +1,16 @@
 import {useForm} from "react-hook-form";
 import Input from "./input.tsx";
 import Button from "./button.tsx";
-
-interface IForm {
-    firstName: string,
-    lastName: string,
-}
+import {ITrainer} from "../types.ts";
+import {useTrainerStore} from "../store/trainer.ts";
 
 export default function RegistrationForm() {
-    const {register, formState: {errors}, handleSubmit} = useForm<IForm>();
+    const {register, formState: {errors}, handleSubmit} = useForm<ITrainer>();
 
-    const onSubmit = (data: IForm) => {
-        console.log('Form data: ', data);
+    const {setTrainer} = useTrainerStore();
+
+    const onSubmit = (data: ITrainer) => {
+        setTrainer(data)
     }
 
     return (
