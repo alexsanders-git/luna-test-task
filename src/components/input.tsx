@@ -1,23 +1,19 @@
-
-interface IProps {
+interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     type: 'text' | 'email' | 'password' | 'number';
-    name: string;
     label: string;
     placeholder?: string;
 }
 
-export default function Input(props: IProps) {
+export default function Input({type, label, placeholder, ...rest}: IProps) {
 
     return (
-        <div className="flex flex-col">
-            <label htmlFor={props.name} className="mb-2 text-gray-700">{props.label}</label>
+        <label className="flex flex-col gap-2 text-gray-700">{label}
             <input
-                id={props.name}
-                type={props.type}
-                name={props.name}
-                placeholder={props.placeholder}
+                type={type}
+                placeholder={placeholder}
                 className="border rounded-lg border-zinc-200 p-3 leading-none focus:outline-none focus:border-indigo-600"
+                {...rest}
             />
-        </div>
+        </label>
     )
 }
