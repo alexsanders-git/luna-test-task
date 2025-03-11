@@ -34,9 +34,10 @@ export default function PokemonSelect() {
     ];
 
 
-    const [selectValue, setSelectValue] = useState<IOption | undefined>(options[0]);
+    // const [selectValue, setSelectValue] = useState<IOption | undefined>(options[0]);
+    const [selectValue, setSelectValue] = useState<IOption[]>([]);
 
     return (
-        <Select options={options} value={selectValue} onChange={option => setSelectValue(option)}/>
+        <Select multiple options={options} value={selectValue} onChange={option => setSelectValue(option)}/>
     )
 }

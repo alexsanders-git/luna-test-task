@@ -8,7 +8,7 @@ export default function IconButton({children, className, ...rest}: IProps) {
     return (
         <button
             type="button"
-            className={`size-[30px] p-1 cursor-pointer ${className}`}
+            className={`size-[22px] cursor-pointer ${className}`}
             {...rest}
         >
             {children}

@@ -2,31 +2,55 @@ import {useEffect, useState} from "react";
 import {ChevronDownIcon, XMarkIcon} from "@heroicons/react/24/solid";
 import IconButton from "./iconButton.tsx";
 
-export interface IOption {
+export type IOption = {
     label: string;
     value: string;
 }
 
-interface IProps {
-    options: IOption[];
+type ISingleProps = {
+    multiple?: false;
     value?: IOption;
-    onChange: (value: IOption | undefined) => void
+    onChange: (value: IOption | undefined) => void;
 }
 
-export default function Select({value, options, onChange}: IProps) {
+type IMultipleProps = {
+    multiple: true;
+    value: IOption[];
+    onChange: (value: IOption[]) => void;
+}
+
+type IProps = {
+    options: IOption[];
+} & (ISingleProps | IMultipleProps);
+
+export default function Select({multiple, value, options, onChange}: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0)
 
     const clearOptions = () => {
-        onChange(undefined);
+        multiple ? onChange([]) : onChange(undefined);
     }
 
     const selectOption = (option: IOption) => {
-        if (option !== value) onChange(option);
+        if (multiple) {
+            if (value.some(v => v.value === option.value)) {
+                onChange(value.filter(o => o.value !== option.value));
+            } else {
+                onChange([...value, option]);
+            }
+        } else {
+            if (option.value !== value?.value) {
+                onChange(option);
+            }
+        }
     }
 
     const isOptionSelected = (option: IOption) => {
-        return value ? option.value === value.value : false;
+        if (multiple) {
+            return value.some(v => v.value === option.value);
+        } else {
+            return value ? option.value === value.value : false;
+        }
     }
 
     useEffect(() => {
@@ -37,8 +61,29 @@ export default function Select({value, options, onChange}: IProps) {
     const classes = `relative flex items-center gap-1 border rounded-lg p-3 leading-none focus:outline-none  ${error ? 'border-rose-500' : 'border-zinc-200 focus:border-indigo-600'}`;
 
     return (
-        <div className={classes} tabIndex={0} onClick={() => setIsOpen(!isOpen)} onBlur={() => setIsOpen(false)}>
-            <span className="grow capitalize">{value?.label}</span>
+        <div
+            tabIndex={0}
+            className={classes}
+            onClick={() => setIsOpen(!isOpen)}
+            onBlur={() => setIsOpen(false)}
+        >
+            <span className="flex gap-2 grow capitalize">
+                {multiple ? value.map(v => (
+                    <button
+                        key={v.value}
+                        onClick={e => {
+                            e.stopPropagation();
+                            selectOption(v);
+                        }}
+                        className="flex items-center gap-1 py-1 px-2 text-sm bg-gray-200 rounded-xl cursor-pointer"
+                    >
+                        {v.label}
+                        <span className="block size-[16px] text-gray-400">
+                             <XMarkIcon/>
+                        </span>
+                    </button>
+                )) : value?.label}
+            </span>
 
             <IconButton onClick={e => {
                 e.stopPropagation();
