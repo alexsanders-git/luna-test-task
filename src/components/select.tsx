@@ -1,6 +1,7 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {ChevronDownIcon, XMarkIcon} from "@heroicons/react/24/solid";
 import IconButton from "./iconButton.tsx";
+import useClickOutside from "../hooks/useClickOutside.ts";
 
 export type IOption = {
     label: string;
@@ -27,6 +28,11 @@ export default function Select({multiple, value, options, onChange}: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0)
     const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    
+
+    useClickOutside(containerRef, () => setIsOpen(false));
 
     const clearOptions = () => {
         multiple ? onChange([]) : onChange(undefined);
@@ -71,10 +77,10 @@ export default function Select({multiple, value, options, onChange}: IProps) {
 
     return (
         <div
+            ref={containerRef}
             tabIndex={0}
             className={classes}
             onClick={() => setIsOpen(!isOpen)}
-            // onBlur={() => setIsOpen(false)}
         >
             <span className="flex flex-wrap gap-2 grow capitalize">
                 {multiple ? value.map(v => (
@@ -98,7 +104,7 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    className="bg-red-400"
+                    className="focus:outline-none focus-visible:outline-none"
                 />
             </span>
 
@@ -117,24 +123,31 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                 <ul
                     className="absolute left-0 top-[105%] w-full max-h-[150px] overflow-auto bg-white border rounded-lg border-zinc-200 z-100"
                 >
-                    {filteredOptions.map((option, index) => (
-                        <li
-                            key={option.value}
-                            data-selected={isOptionSelected(option)}
-                            className={`py-2 px-4 capitalize cursor-pointer
-                                ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
-                                ${index === highlightedIndex ? 'bg-indigo-300' : ''}
-                            `}
-                            onClick={e => {
-                                e.stopPropagation();
-                                selectOption(option);
-                                setIsOpen(false);
-                            }}
-                            onMouseEnter={() => setHighlightedIndex(index)}
-                        >
-                            {option.label}
+                    {filteredOptions.length > 0 ? (
+                        filteredOptions.map((option, index) => (
+                            <li
+                                key={option.value}
+                                data-selected={isOptionSelected(option)}
+                                className={`py-2 px-4 capitalize cursor-pointer
+                                    ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
+                                    ${index === highlightedIndex ? 'bg-indigo-300' : ''}
+                                `}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    selectOption(option);
+                                    setSearchQuery('');
+                                    setIsOpen(false);
+                                }}
+                                onMouseEnter={() => setHighlightedIndex(index)}
+                            >
+                                {option.label}
+                            </li>
+                        ))
+                    ) : (
+                        <li className="py-2 px-4 text-gray-500 capitalize">
+                            No options
                         </li>
-                    ))}
+                    )}
                 </ul>
             )}
         </div>
