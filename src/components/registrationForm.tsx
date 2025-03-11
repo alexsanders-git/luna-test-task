@@ -1,8 +1,9 @@
 import {useForm} from "react-hook-form";
 import Input from "./input.tsx";
+import PokemonSelect from "./pokemonSelect.tsx";
 import Button from "./button.tsx";
-import {ITrainer} from "../types.ts";
 import {useTrainerStore} from "../store/trainer.ts";
+import {ITrainer} from "../types.ts";
 
 export default function RegistrationForm() {
     const {register, formState: {errors}, handleSubmit} = useForm<ITrainer>();
@@ -39,6 +40,9 @@ export default function RegistrationForm() {
                     pattern: {value: /^[A-Za-z]+$/, message: 'Only Latin letters are allowed'}
                 })}
             />
+
+            <PokemonSelect/>
+
             <Button text="Save" type="submit"/>
         </form>
     )
