@@ -6,7 +6,7 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function Input({type, label, placeholder, error, ...rest}: IProps) {
-    const classes = `mt-1 border rounded-lg p-3 leading-none focus:outline-none  ${error ? 'border-rose-500' : 'border-zinc-200 focus:border-indigo-600'}`;
+    const classes = `mt-1 border rounded-lg p-3 leading-none focus:outline-none focus-visible:outline-none  ${error ? 'border-rose-500' : 'border-zinc-200 focus:border-indigo-600 focus-visible:border-indigo-600'}`;
 
     return (
         <label className="flex flex-col text-gray-700">{label}

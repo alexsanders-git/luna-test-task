@@ -15,9 +15,13 @@ export default function PokemonSelect() {
     return (
         <>
             {loading ? (
-                <div>Loading...</div>
+                <div>
+                    <div className="w-[100px] h-[20px] mb-1 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="w-full h-[48px] bg-gray-200 rounded-lg animate-pulse"></div>
+                </div>
             ) : (
-                <Select multiple options={options} value={selectValue} onChange={option => setSelectValue(option)}/>
+                <Select label="Select your team" multiple options={options} value={selectValue}
+                        onChange={option => setSelectValue(option)}/>
             )}
         </>
 

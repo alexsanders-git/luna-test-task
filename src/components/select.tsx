@@ -21,16 +21,16 @@ type IMultipleProps = {
 }
 
 type IProps = {
+    label: string;
     options: IOption[];
 } & (ISingleProps | IMultipleProps);
 
-export default function Select({multiple, value, options, onChange}: IProps) {
+export default function Select({label, multiple, value, options, onChange}: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0)
     const [searchQuery, setSearchQuery] = useState<string>('');
 
     const containerRef = useRef<HTMLDivElement>(null);
-    
 
     useClickOutside(containerRef, () => setIsOpen(false));
 
@@ -62,6 +62,7 @@ export default function Select({multiple, value, options, onChange}: IProps) {
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
+        setIsOpen(true);
     };
 
     const filteredOptions = options.filter(option =>
@@ -73,15 +74,16 @@ export default function Select({multiple, value, options, onChange}: IProps) {
     }, [isOpen])
 
     const error = false;
-    const classes = `relative flex items-center gap-1 border rounded-lg p-3 leading-none focus:outline-none  ${error ? 'border-rose-500' : 'border-zinc-200 focus:border-indigo-600'}`;
+    const classes = `relative flex items-center gap-1 mt-1 border rounded-lg p-3 leading-none focus:outline-none  ${error ? 'border-rose-500' : 'border-zinc-200 focus:border-indigo-600'}`;
 
     return (
         <div
             ref={containerRef}
-            tabIndex={0}
-            className={classes}
             onClick={() => setIsOpen(!isOpen)}
+            className="flex flex-col text-gray-700"
         >
+            {label}
+            <div className={classes} tabIndex={0}>
             <span className="flex flex-wrap gap-2 grow capitalize">
                 {multiple ? value.map(v => (
                     <button
@@ -108,48 +110,49 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                 />
             </span>
 
-            <IconButton onClick={e => {
-                e.stopPropagation();
-                clearOptions();
-            }}>
-                <XMarkIcon/>
-            </IconButton>
+                <IconButton onClick={e => {
+                    e.stopPropagation();
+                    clearOptions();
+                }}>
+                    <XMarkIcon/>
+                </IconButton>
 
-            <IconButton>
-                <ChevronDownIcon/>
-            </IconButton>
+                <IconButton>
+                    <ChevronDownIcon/>
+                </IconButton>
 
-            {isOpen && (
-                <ul
-                    className="absolute left-0 top-[105%] w-full max-h-[150px] overflow-auto bg-white border rounded-lg border-zinc-200 z-100"
-                >
-                    {filteredOptions.length > 0 ? (
-                        filteredOptions.map((option, index) => (
-                            <li
-                                key={option.value}
-                                data-selected={isOptionSelected(option)}
-                                className={`py-2 px-4 capitalize cursor-pointer
-                                    ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
-                                    ${index === highlightedIndex ? 'bg-indigo-300' : ''}
-                                `}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    selectOption(option);
-                                    setSearchQuery('');
-                                    setIsOpen(false);
-                                }}
-                                onMouseEnter={() => setHighlightedIndex(index)}
-                            >
-                                {option.label}
+                {isOpen && (
+                    <ul
+                        className="absolute left-0 top-[105%] w-full max-h-[150px] overflow-auto bg-white border rounded-lg border-zinc-200 z-100"
+                    >
+                        {filteredOptions.length > 0 ? (
+                            filteredOptions.map((option, index) => (
+                                <li
+                                    key={option.value}
+                                    data-selected={isOptionSelected(option)}
+                                    className={`py-2 px-4 capitalize cursor-pointer
+                                        ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
+                                        ${index === highlightedIndex ? 'bg-indigo-300' : ''}
+                                    `}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        selectOption(option);
+                                        setSearchQuery('');
+                                        setIsOpen(false);
+                                    }}
+                                    onMouseEnter={() => setHighlightedIndex(index)}
+                                >
+                                    {option.label}
+                                </li>
+                            ))
+                        ) : (
+                            <li className="py-2 px-4 text-gray-500 capitalize">
+                                No options
                             </li>
-                        ))
-                    ) : (
-                        <li className="py-2 px-4 text-gray-500 capitalize">
-                            No options
-                        </li>
-                    )}
-                </ul>
-            )}
+                        )}
+                    </ul>
+                )}
+            </div>
         </div>
     );
 }
