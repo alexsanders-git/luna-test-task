@@ -26,6 +26,7 @@ type IProps = {
 export default function Select({multiple, value, options, onChange}: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [highlightedIndex, setHighlightedIndex] = useState<number>(0)
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     const clearOptions = () => {
         multiple ? onChange([]) : onChange(undefined);
@@ -53,6 +54,14 @@ export default function Select({multiple, value, options, onChange}: IProps) {
         }
     }
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const filteredOptions = options.filter(option =>
+        option.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     useEffect(() => {
         if (isOpen) setHighlightedIndex(0);
     }, [isOpen])
@@ -65,9 +74,9 @@ export default function Select({multiple, value, options, onChange}: IProps) {
             tabIndex={0}
             className={classes}
             onClick={() => setIsOpen(!isOpen)}
-            onBlur={() => setIsOpen(false)}
+            // onBlur={() => setIsOpen(false)}
         >
-            <span className="flex gap-2 grow capitalize">
+            <span className="flex flex-wrap gap-2 grow capitalize">
                 {multiple ? value.map(v => (
                     <button
                         key={v.value}
@@ -75,7 +84,7 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                             e.stopPropagation();
                             selectOption(v);
                         }}
-                        className="flex items-center gap-1 py-1 px-2 text-sm bg-gray-200 rounded-xl cursor-pointer"
+                        className="flex items-center gap-1 py-1 px-2 text-sm capitalize bg-gray-200 rounded-xl cursor-pointer"
                     >
                         {v.label}
                         <span className="block size-[16px] text-gray-400">
@@ -83,6 +92,14 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                         </span>
                     </button>
                 )) : value?.label}
+
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="bg-red-400"
+                />
             </span>
 
             <IconButton onClick={e => {
@@ -96,28 +113,30 @@ export default function Select({multiple, value, options, onChange}: IProps) {
                 <ChevronDownIcon/>
             </IconButton>
 
-            <ul
-                className={`absolute left-0 w-full max-h-[150px] top-[105%] bg-white overflow-auto border rounded-lg border-zinc-200 z-100 ${isOpen ? 'block' : 'hidden'}`}
-            >
-                {options.map((option, index) => (
-                    <li
-                        key={option.value}
-                        data-selected={isOptionSelected(option)}
-                        className={`py-2 px-4 capitalize cursor-pointer
-                            ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
-                            ${index === highlightedIndex ? 'bg-indigo-300' : ''}
-                        `}
-                        onClick={e => {
-                            e.stopPropagation();
-                            selectOption(option);
-                            setIsOpen(false);
-                        }}
-                        onMouseEnter={() => setHighlightedIndex(index)}
-                    >
-                        {option.label}
-                    </li>
-                ))}
-            </ul>
+            {isOpen && (
+                <ul
+                    className="absolute left-0 top-[105%] w-full max-h-[150px] overflow-auto bg-white border rounded-lg border-zinc-200 z-100"
+                >
+                    {filteredOptions.map((option, index) => (
+                        <li
+                            key={option.value}
+                            data-selected={isOptionSelected(option)}
+                            className={`py-2 px-4 capitalize cursor-pointer
+                                ${isOptionSelected(option) ? 'bg-indigo-200' : ''}
+                                ${index === highlightedIndex ? 'bg-indigo-300' : ''}
+                            `}
+                            onClick={e => {
+                                e.stopPropagation();
+                                selectOption(option);
+                                setIsOpen(false);
+                            }}
+                            onMouseEnter={() => setHighlightedIndex(index)}
+                        >
+                            {option.label}
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }
